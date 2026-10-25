@@ -137,7 +137,7 @@ HAL 只认 `HAL_UART_RxCpltCallback` / `HAL_GPIO_EXTI_Callback`，C 语言区分
 
 ## 演示视频
 
-[点此观看演示视频（41 秒，1080p）](https://github.com/xwl1212/ac01/releases/download/v1.0-week1/0bb3a8811207fa36bd924cb7a0104d95_raw.mp4)
+[点此观看演示视频（41 秒，1080p）](https://github.com/xwl1212/ac01/releases/download/v1.0-week1/week1_demo.mp4)
 
 视频内容：
 
