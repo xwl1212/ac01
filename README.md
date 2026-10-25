@@ -15,7 +15,7 @@
 
 ## Week 1 · GPIO + 串口中断
 
-[→ 查看 week1_gpio_uart](./week1_gpio_uart/README.md)
+[查看 week1_gpio_uart 源码与说明](./week1_gpio_uart/README.md) · [观看演示视频（41 秒）](https://github.com/xwl1212/ac01/releases/tag/v1.0-week1)
 
 - 芯片：STM32F103C8T6，72MHz
 - 按键外部中断（EXTI0）+ 串口接收中断，双入口
