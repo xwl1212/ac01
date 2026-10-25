@@ -137,7 +137,15 @@ HAL 只认 `HAL_UART_RxCpltCallback` / `HAL_GPIO_EXTI_Callback`，C 语言区分
 
 ## 演示视频
 
-TODO：录完后在 Release 中挂链接。
+[点此观看演示视频（41 秒，1080p）](https://github.com/xwl1212/ac01/releases/download/v1.0-week1/0bb3a8811207fa36bd924cb7a0104d95_raw.mp4)
+
+视频内容：
+
+1. 上电，三灯全灭，串口无输出
+2. 按下 PA0，PA1 点亮约 1 秒后熄灭，串口输出 `button pressed`
+3. 电脑发送字符，PA2 点亮约 1 秒后熄灭，串口回显该字符
+
+也可以从 [Release 页面](https://github.com/xwl1212/ac01/releases/tag/v1.0-week1) 下载。
 
 ## 关键文件
 
