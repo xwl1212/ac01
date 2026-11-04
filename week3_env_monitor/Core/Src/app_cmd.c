@@ -1,6 +1,7 @@
 #include "app_cmd.h"
 #include "bsp_uart.h"
 #include "app_adc.h"
+#include "app_power.h"
 #include "stdio.h"
 #include "string.h"
 
@@ -84,6 +85,7 @@ void Cmd_Process(void)
         s_cmd[s_len] = '\0';
         Cmd_Execute(s_cmd);
         s_len = 0;
+        Power_TouchActivity();      /* 串口有操作，推迟休眠 */
       }
     }
     else if (s_len < CMD_BUF_SIZE - 1)

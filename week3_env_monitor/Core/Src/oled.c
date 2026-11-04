@@ -93,6 +93,16 @@ void OLED_Clear(void)
   }
 }
 
+void OLED_DisplayOn(void)
+{
+  OLED_WriteCmd(0xAF);      /* 0xAF = 打开显示的电平输出 */
+}
+
+void OLED_DisplayOff(void)
+{
+  OLED_WriteCmd(0xAE);      /* 0xAE = 关闭显示，显存内容不变，再 0xAF 就恢复 */
+}
+
 /*
  * 显示一个字符。字模是 8 列 x 16 行，所以要把上下两半分别写进 page 和 page+1。
  * page 只能传 0/2/4/6，传 7 会把下半截写到屏外。

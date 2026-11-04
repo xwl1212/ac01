@@ -31,6 +31,7 @@
 #include "app_adc.h"
 #include "app_cmd.h"
 #include "bsp_key.h"
+#include "app_power.h"
 
 /* USER CODE END Includes */
 
@@ -156,6 +157,7 @@ int main(void)
   App_AdcInit();              /* ADC 校准一次 */
   BspUart_Init();             /* 打开串口中断接收 */
   Cmd_Init();                 /* 页号回到第 1 页 */
+  Power_Init();               /* 低功耗计时从这里开始 */
 
   DrawFrame();                /* 画第 1 页的固定框架 */
   g_last_page = g_page;
@@ -173,10 +175,23 @@ int main(void)
     /* 每轮都来取一次串口字节，不阻塞，有命令就执行 */
     Cmd_Process();
 
+    /*
+     * 空闲满 1 分钟就关屏进 STOP，靠 PB0 的下降沿唤醒。
+     * 唤醒回来屏是空的，把 g_last_page 置 0 让下面的重画分支生效。
+     */
+    if (Power_Task())
+    {
+      g_last_page = 0;
+      g_last_pct  = 255;
+      g_last_ms   = HAL_GetTick();
+      continue;
+    }
+
     /* 按键按下就翻页，和串口 PAGE 命令走同一个入口 */
     if (BspKey_Scan())
     {
       Cmd_NextPage();
+      Power_TouchActivity();
     }
 
     /* 页号被命令改了，清屏重画固定框架 */

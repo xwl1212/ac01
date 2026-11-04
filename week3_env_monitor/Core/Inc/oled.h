@@ -16,6 +16,8 @@
 
 void OLED_Init(void);
 void OLED_Clear(void);
+void OLED_DisplayOn(void);                        /* 点亮显示（0xAF） */
+void OLED_DisplayOff(void);                       /* 关闭显示（0xAE），进入低功耗前调用 */
 void OLED_ShowChar(uint8_t x, uint8_t page, char ch);
 void OLED_ShowString(uint8_t x, uint8_t page, const char *str);
 void OLED_ShowNum(uint8_t x, uint8_t page, uint32_t num, uint8_t len);

@@ -15,5 +15,6 @@
 #define KEY_PIN         GPIO_PIN_0
 
 uint8_t BspKey_Scan(void);      /* 检测到一次有效按下返回 1，否则返回 0 */
+void    BspKey_Sync(void);      /* 把内部状态同步到当前引脚电平，不产生按键事件（休眠唤醒后调用） */
 
 #endif /* __BSP_KEY_H */

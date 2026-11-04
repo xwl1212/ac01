@@ -7,10 +7,12 @@
  */
 #define KEY_DEBOUNCE_MS     20
 
+/* 放到文件作用域，BspKey_Sync 也要改这两个量 */
+static uint8_t  s_stable = 1;     /* 稳定电平，上电默认松开 */
+static uint32_t s_tick   = 0;     /* 上次电平变化（或稳定）的时刻 */
+
 uint8_t BspKey_Scan(void)
 {
-  static uint8_t  s_stable = 1;     /* 稳定电平，上电默认松开 */
-  static uint32_t s_tick   = 0;     /* 上次电平变化（或稳定）的时刻 */
   uint8_t now = (uint8_t)HAL_GPIO_ReadPin(KEY_PORT, KEY_PIN);
 
   if (now != s_stable)
@@ -33,4 +35,15 @@ uint8_t BspKey_Scan(void)
   }
 
   return 0;
+}
+
+/*
+ * 休眠唤醒时按键可能还按着。如果直接 Scan，会把这个"还按着"的状态
+ * 当成一次新按下，多翻一页。所以唤醒后先同步一次，把当前电平当成基准，
+ * 只有之后再从松开变按下才算事件。
+ */
+void BspKey_Sync(void)
+{
+  s_stable = (uint8_t)HAL_GPIO_ReadPin(KEY_PORT, KEY_PIN);
+  s_tick   = HAL_GetTick();
 }
