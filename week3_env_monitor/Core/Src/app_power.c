@@ -81,20 +81,27 @@ uint8_t Power_Task(void)
   printf(">> sleep\r\n");
 
   /*
-   * 清挂起位必须紧贴 WFI：EXTI 的 PR 位和 NVIC 的 pending 位一起清，
-   * 上面任何一次干扰留下的挂起都不能带进来。
+   * 这里不用只睡一次：线上偶尔的毛刺也能触发 EXTI0，睡下去又被立刻弹回来。
+   * 醒来先看 PB0 的实际电平——真按键会一直按着（低电平），毛刺早就回到高电平了。
+   * 不是真按键就继续睡，既不会误唤醒，也不会白闪一次屏。
    */
-  __HAL_GPIO_EXTI_CLEAR_IT(KEY_PIN);
-  NVIC_ClearPendingIRQ(EXTI0_IRQn);
+  for (;;)
+  {
+    /* 清挂起位必须紧贴 WFI：EXTI 的 PR 位和 NVIC 的 pending 位一起清 */
+    __HAL_GPIO_EXTI_CLEAR_IT(KEY_PIN);
+    NVIC_ClearPendingIRQ(EXTI0_IRQn);
 
-  HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
-  /* ↑ 程序在这里停住，直到 PB0 的下降沿唤醒 */
+    HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
+    /* ↑ 程序在这里停住，直到 PB0 的下降沿唤醒 */
 
-  /*
-   * 唤醒后 STOP 把 HSE+PLL 关掉了，系统时钟自动回到 HSI 8MHz。
-   * 所有按 72MHz 配好的外设都得按新时钟重来一遍。
-   */
-  SystemClock_Config();
+    /* 醒来第一件事是恢复 72MHz，后面的代码才能正常跑 */
+    SystemClock_Config();
+
+    if (HAL_GPIO_ReadPin(KEY_PORT, KEY_PIN) == GPIO_PIN_RESET)
+    {
+      break;                        /* 键还按着，是真的按键唤醒 */
+    }
+  }
 
   printf(">> wake\r\n");
 
