@@ -180,7 +180,7 @@ STOP 模式下 EXTI 线仍然有效，所以下降沿能直接把 CPU 叫醒；�
 - **旧的 EXTI 标志要清掉**：否则刚进 STOP 就会被残留事件立刻唤醒，等于没睡
 - **唤醒的那次按键不算翻页**：唤醒后先调 `BspKey_Sync()` 把当前电平当成基准，避免手还没松就又翻一页
 - **EXTI 没使能就不能睡**：进 STOP 前检查 `EXTI->IMR`，否则只能按复位键恢复
-- **调试器会断开**：进 STOP 后 SWD 掉线，重新下载要在 Keil 的 `Debug → Settings` 里把 Connect 改成 `under Reset`，或者按住复位键再点下载
+- **调试器会断开**：进 STOP 后 SWD 掉线，重新下载要在 Keil 的 `Debug → Settings` 里把 Connect 改成 `under Reset`，或者按住复位键再点下载。代码里已把 `DBGMCU_CR` 的 `DBG_STOP` 位置 1（宏 `POWER_KEEP_SWD_IN_STOP`），STOP 时调试时钟保持运行，SWD 不会断；正式测功耗前把这个宏改成 0
 
 ## 构建
 

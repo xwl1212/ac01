@@ -13,7 +13,14 @@
  *   相比正常工作时的 50mA 已经足够省电，因此选 STOP + PB0/EXTI0。
  */
 
-#define POWER_IDLE_TIMEOUT_MS   60000U   /* 60s 没有操作就休眠 */
+#define POWER_IDLE_TIMEOUT_MS   60000U   /* 60s 没有操作就休眠，调试时改小即可 */
+
+/*
+ * STOP 模式下内核时钟停止，SWD 会断开，调试器就抓不到芯片。
+ * 把 DBGMCU_CR 的 DBG_STOP 位置 1 可以让调试时钟继续跑。
+ * 调试时保持 1；正式测功耗前改成 0，否则功耗会比 20µA 高一些。
+ */
+#define POWER_KEEP_SWD_IN_STOP  1
 
 void    Power_Init(void);            /* 初始化：开 PWR 时钟、记下活跃时刻 */
 void    Power_TouchActivity(void);   /* 有操作就调一下，重置空闲计时 */

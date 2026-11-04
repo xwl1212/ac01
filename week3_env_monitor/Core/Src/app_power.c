@@ -18,6 +18,12 @@ static uint32_t s_last_active;      /* 最近一次"有操作"的时刻 */
 void Power_Init(void)
 {
   __HAL_RCC_PWR_CLK_ENABLE();       /* 进 STOP 要写 PWR 的寄存器，必须先把它的时钟打开 */
+
+#if POWER_KEEP_SWD_IN_STOP
+  /* F1 的 DBGMCU 没有独立时钟门控，直接写 CR 就行 */
+  DBGMCU->CR |= DBGMCU_CR_DBG_STOP; /* STOP 下保持调试时钟，SWD 不断线 */
+#endif
+
   s_last_active = HAL_GetTick();
 }
 
