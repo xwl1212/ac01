@@ -6,6 +6,7 @@
 #include "i2c.h"
 #include "adc.h"
 #include "usart.h"
+#include <stdio.h>
 
 /* 这些只在 main.c / CubeMX 生成的文件里定义，这里直接引用 */
 extern void SystemClock_Config(void);
@@ -69,10 +70,22 @@ uint8_t Power_Task(void)
     return 0;
   }
 
-  /* 清掉可能还挂着的 EXTI 标志，不然刚进 STOP 就会被这次旧事件立刻唤醒 */
-  __HAL_GPIO_EXTI_CLEAR_IT(KEY_PIN);
+  OLED_DisplayOff();
 
-  OLED_DisplayOff();                /* 屏先关，省掉 OLED 那部分电流 */
+  /*
+   * 关屏这条 I2C 传输会在 GND/VCC 上带出一点干扰，可能耦合到 PB0 产生毛刺。
+   * 等它过去，再清标志，否则刚进 STOP 就会被这次毛刺唤醒（看起来就是屏闪一下）。
+   */
+  HAL_Delay(10);
+
+  printf(">> sleep\r\n");
+
+  /*
+   * 清挂起位必须紧贴 WFI：EXTI 的 PR 位和 NVIC 的 pending 位一起清，
+   * 上面任何一次干扰留下的挂起都不能带进来。
+   */
+  __HAL_GPIO_EXTI_CLEAR_IT(KEY_PIN);
+  NVIC_ClearPendingIRQ(EXTI0_IRQn);
 
   HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
   /* ↑ 程序在这里停住，直到 PB0 的下降沿唤醒 */
@@ -82,6 +95,8 @@ uint8_t Power_Task(void)
    * 所有按 72MHz 配好的外设都得按新时钟重来一遍。
    */
   SystemClock_Config();
+
+  printf(">> wake\r\n");
 
   HAL_I2C_DeInit(&hi2c1);
   MX_I2C1_Init();
